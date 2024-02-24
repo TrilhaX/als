@@ -17,6 +17,26 @@ local Window = Library:CreateWindow({
 
 Library:Notify('Loading Anime Last Stand Script', 5)
 
+function autouseuniversalskill()
+    while getgenv().autouseuniversalskill == true do
+        local args = {
+            [1] = workspace:WaitForChild("Towers"):WaitForChild("Saber")
+        }
+    
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Ability"):InvokeServer(unpack(args))
+        local args = {
+            [1] = workspace:WaitForChild("Towers"):WaitForChild("Gojo")
+        }
+    
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Ability"):InvokeServer(unpack(args))
+        local args = {
+            [1] = workspace:WaitForChild("Towers"):WaitForChild("Sukuna")
+        }
+    
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Ability"):InvokeServer(unpack(args))
+        wait(waittimeskill)
+    end
+end    
 
 function autoplace()
     while getgenv().autoplace == true do
@@ -112,6 +132,8 @@ local Tabs = {
     Main = Window:AddTab('Main'),
 }
 
+local LeftGroupBox = Tabs.Main:AddLeftGroupbox('Player')
+
 local MyButton = LeftGroupBox:AddButton({
     Text = 'Go To Lobby',
     Func = function()
@@ -191,7 +213,7 @@ LeftGroupBox:AddToggle('Auto Place Unit', {
 
 LeftGroupBox:AddSlider('waittime', {
     Text = 'spam time of auto place/upgrade',
-    Default = 0,
+    Default = 1,
     Min = 1,
     Max = 10,
     Rounding = 1,
@@ -202,20 +224,48 @@ LeftGroupBox:AddSlider('waittime', {
     end
 })
 
+LeftGroupBox:AddDivider()
+
+LeftGroupBox:AddToggle('Auto Universal Skill', {
+    Text = 'Auto Universal Skill',
+    Default = false,
+    Tooltip = '',
+    Callback = function(Value)
+        getgenv().autouseuniversalskill = Value
+        autouseuniversalskill()
+    end
+})
+
+LeftGroupBox:AddSlider('waittimeskill', {
+    Text = 'spam time of auto skill',
+    Default = 1,
+    Min = 1,
+    Max = 10,
+    Rounding = 1,
+    Compact = false,
+
+    Callback = function(Value)
+        waittimeskill = Value
+    end
+})
+
 local RightGroupBox = Tabs.Main:AddRightGroupbox('Summon')
 
 
-local function summonUnit(unitName, quantity)
+local function summonUnit(quantity, selectedBanner)
     local args = {
-        [1] = quantity, -- Utilizando o valor de quantidade selecionado
-        [2] = "1"
+        [1] = quantity,
+        [2] = selectedBanner
     }
     
     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Summon"):InvokeServer(unpack(args))
 end
 
-
-local mythic = game:GetService("ReplicatedStorage"):FindFirstChild("Banner") and game:GetService("ReplicatedStorage").Banner["1"].Mythic.Value
+local celestial = game:GetService("ReplicatedStorage"):FindFirstChild("Banner") and game:GetService("ReplicatedStorage").Banner["2"].Celestial.Value
+local ultimate = game:GetService("ReplicatedStorage"):FindFirstChild("Banner") and game:GetService("ReplicatedStorage").Banner["2"].Ultimate.Value
+local mythic1B2 = game:GetService("ReplicatedStorage"):FindFirstChild("Banner") and (game:GetService("ReplicatedStorage").Banner["2"].Mythic1.Value)
+local mythic2B2 = game:GetService("ReplicatedStorage"):FindFirstChild("Banner") and (game:GetService("ReplicatedStorage").Banner["2"].Mythic2.Value)
+local mythicB1 = game:GetService("ReplicatedStorage"):FindFirstChild("Banner") and game:GetService("ReplicatedStorage").Banner["1"].Mythic.Value
 local legendary = game:GetService("ReplicatedStorage"):FindFirstChild("Banner") and game:GetService("ReplicatedStorage").Banner["1"].Legendary.Value
 local epic1 = game:GetService("ReplicatedStorage"):FindFirstChild("Banner") and game:GetService("ReplicatedStorage").Banner["1"].Epic1.Value
 local epic2 = game:GetService("ReplicatedStorage"):FindFirstChild("Banner") and game:GetService("ReplicatedStorage").Banner["1"].Epic2.Value
@@ -239,6 +289,7 @@ end
 
 local selectedUnit = nil
 local selectedQuantity = nil
+local selectedBanner = nil  -- Adicionado para armazenar o banner selecionado
 
 RightGroupBox:AddDropdown('SummonUnit', {
     Values = ValuesSummonUnit,
@@ -251,6 +302,19 @@ RightGroupBox:AddDropdown('SummonUnit', {
         selectedUnit = value
     end
 })
+
+RightGroupBox:AddDropdown('Bsummon', {
+    Values = { "1", "2" }, -- Corrigindo o nome do atributo para 'Values'
+    Default = "None", -- Defina um valor padrão apropriado
+    Multi = false,
+    Text = 'Choose Banner To Summon',
+    Tooltip = '',
+
+    Callback = function(value)
+        selectedBanner = value -- Armazenando o valor selecionado em uma variável
+    end
+})
+
 
 RightGroupBox:AddDropdown('Qsummon', {
     Values = { "1", "10" }, -- Corrigindo o nome do atributo para 'Values'
@@ -270,9 +334,9 @@ RightGroupBox:AddToggle('Auto Summon', {
     Tooltip = '',
     Callback = function(enabled)
         if enabled then
-            if selectedUnit == mythic or selectedUnit == legendary or selectedUnit == epic1 or selectedUnit == epic2 or selectedUnit == rare1 or selectedUnit == rare2 then
-                summonUnit(selectedUnit, selectedQuantity)
-                wait(10) -- Aguarda 10 segundos após a invocação
+            if selectedUnit == celestial or selectedUnit == ultimate or selectedUnit == mythic1B2 or selectedUnit == mythic2B2  or selectedUnit == mythicB1 or selectedUnit == legendary or selectedUnit == epic1 or selectedUnit == epic2 or selectedUnit == rare1 or selectedUnit == rare2 then
+                summonUnit(selectedQuantity, selectedBanner)  -- Ajuste da chamada da função
+                wait(10)
             end
         end
     end
