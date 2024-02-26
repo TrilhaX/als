@@ -7,7 +7,6 @@ local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 
 local Window = Library:CreateWindow({
-
     Title = 'Tempest Hub | Anime Last Stand',
     Center = true,
     AutoShow = true,
@@ -22,17 +21,17 @@ function autouseuniversalskill()
         local args = {
             [1] = workspace:WaitForChild("Towers"):WaitForChild("Saber")
         }
-    
+
         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Ability"):InvokeServer(unpack(args))
         local args = {
             [1] = workspace:WaitForChild("Towers"):WaitForChild("Gojo")
         }
-    
+
         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Ability"):InvokeServer(unpack(args))
         local args = {
             [1] = workspace:WaitForChild("Towers"):WaitForChild("Sukuna")
         }
-    
+
         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Ability"):InvokeServer(unpack(args))
         wait(waittimeskill)
     end
@@ -127,14 +126,13 @@ function autoupgrade()
     end
 end
 
-
 local Tabs = {
     Main = Window:AddTab('Main'),
 }
 
 local LeftGroupBox = Tabs.Main:AddLeftGroupbox('Player')
 
-local MyButton = LeftGroupBox:AddButton({
+local MyButton1 = LeftGroupBox:AddButton({
     Text = 'Go To Lobby',
     Func = function()
         game:GetService("TeleportService"):Teleport(12886143095, LocalPlayer)
@@ -143,7 +141,7 @@ local MyButton = LeftGroupBox:AddButton({
     Tooltip = ''
 })
 
-local MyButton = LeftGroupBox:AddButton({
+local MyButton2 = LeftGroupBox:AddButton({
     Text = 'Reedem Codes',
     Func = function()
         local codes = {
@@ -250,7 +248,6 @@ LeftGroupBox:AddSlider('waittimeskill', {
 })
 
 local RightGroupBox = Tabs.Main:AddRightGroupbox('Summon')
-
 
 local function summonUnit(quantity, selectedBanner)
     local args = {
@@ -377,24 +374,24 @@ end
 local scroll = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Inventory") and game:GetService("Players").LocalPlayer.PlayerGui.Inventory.BG.Scroll
 
 if scroll then
-local children = scroll:GetChildren()
+    local children = scroll:GetChildren()
 
-for i, child in ipairs(children) do
-    local blacklist1 = {
-        ["UIGridLayout"] = true,
-    }
-    if not blacklist1[child.Name] then
-        local children2 = child:GetChildren()
-        for j, child2 in ipairs(children2) do
-            local blacklist2 = {
-                ["Equipped"] = true,
-                ["Locked"] = true,
-                ["UIAspectRatioConstraint"] = true,
-                ["BG"] = true,
-                ["Selection"] = true,
-            }
-            if not blacklist2[child2.Name] then
-                table.insert(ValuesUnitId, child2.Value.. " | " .. child2.Parent.Name ) -- Corrigido para concatenar corretamente os valores
+    for i, child in ipairs(children) do
+        local blacklist1 = {
+            ["UIGridLayout"] = true,
+        }
+        if not blacklist1[child.Name] then
+            local children2 = child:GetChildren()
+            for j, child2 in ipairs(children2) do
+                local blacklist2 = {
+                    ["Equipped"] = true,
+                    ["Locked"] = true,
+                    ["UIAspectRatioConstraint"] = true,
+                    ["BG"] = true,
+                    ["Selection"] = true,
+                }
+                if not blacklist2[child2.Name] then
+                    table.insert(ValuesUnitId, child2.Value.. " | " .. child2.Parent.Name ) -- Corrigido para concatenar corretamente os valores
                 end
             end
         end
@@ -406,7 +403,7 @@ RightGroupBox:AddDropdown('TechRollUnit', {
     Values = ValuesUnitId, -- Verifique se 'values' está definido corretamente
     Default = "None", -- Defina um valor padrão apropriado
     Multi = false,
-    Text = 'Choose Unit',
+    Text = 'Choose Unit To Roll Tech',
     Tooltip = '',
 
     Callback = function(value)
@@ -414,20 +411,20 @@ RightGroupBox:AddDropdown('TechRollUnit', {
     end
 })
 
-RightGroupBox:AddDropdown('Select Technique', {
-    Values = ValuesTechnique, -- Corrigindo o nome do atributo para 'Values'
+RightGroupBox:AddDropdown('TechRoll', {
+    Values = ValuesTechnique , -- Verifique se 'values' está definido corretamente
     Default = "None", -- Defina um valor padrão apropriado
     Multi = false,
-    Text = 'Choose Technique To Roll',
+    Text = 'Choose Tech To Roll',
     Tooltip = '',
 
     Callback = function(value)
-        selectedtech = value -- Armazenando o valor selecionado em uma variável
+        selectedtech = value
     end
 })
 
-RightGroupBox:AddToggle('Auto Roll Techniques', {
-    Text = 'Auto Roll Techniques',
+RightGroupBox:AddToggle('Auto Roll Technique', {
+    Text = 'Auto Roll Technique',
     Default = false,
     Tooltip = '',
     Callback = function(enabled)
@@ -437,8 +434,137 @@ RightGroupBox:AddToggle('Auto Roll Techniques', {
     end
 })
 
+local RightGroupBox = Tabs.Main:AddRightGroupbox('Auto Enter')
+
+local ValuesportalTier = {}  -- Definindo a tabela para os valores do dropdown 'Tier'
+
+if portalid then
+    local children = portalid:GetChildren()
+
+    for i, child in ipairs(children) do
+        local blacklist = {
+            ["UIGridLayout"] = true,
+        }
+        if not blacklist[child.Name] then
+            local selection = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Items") and game:GetService("Players").LocalPlayer.PlayerGui.Items.BG.Portals[child.Name].Selection
+
+            if selection then
+                local mapa = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Items") and game:GetService("Players").LocalPlayer.PlayerGui.Items.BG.Portals[child.Name].Selection.Holder
+
+                if mapa then
+                    local mapChildren = mapa:GetChildren()
+
+                    for i, mapChild in ipairs(mapChildren) do 
+                        local blacklistMap = {
+                            ["UICorner"] = true,
+                            ["UIStroke"] = true,
+                            ["UIGridLayout"] = true,
+                            ["Act"] = true,
+                            ["Challenge"] = true,
+                            ["Health"] = true,
+                        }
+                        if not blacklistMap[mapChild.Name] then
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
 
 
+for i, child in ipairs(children) do
+    local blacklist = {
+        ["UIGridLayout"] = true,
+    }
+    if not blacklist[child.Name] then
+        local portalmap = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Items") and game:GetService("Players").LocalPlayer.PlayerGui.Items.BG.Portals[child.Name].Selection.Holder.Map
+    end
+end
+
+local maps = game:GetService("ReplicatedStorage").Gradients.Maps
+local ValueMapa = {}
+
+for _, child in ipairs(maps:GetChildren()) do
+    table.insert(ValueMapa, child.Name)
+end
+
+-- Função para abrir um portal com o tier selecionado
+local selectedTier = "None"
+local selectedMap = "None"
+
+-- Função para abrir o portal com o tier e mapa selecionados
+local function openSelectedPortal()
+    if selectedTier ~= "None" and selectedMap ~= "None" then
+        local portalid = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Items") and game:GetService("Players").LocalPlayer.PlayerGui.Items.BG.Portals
+        if portalid then
+            for _, child in ipairs(portalid:GetChildren()) do
+                if child.Name ~= "UIGridLayout" then
+                    local portaname = child.BG.Viewport.PortalName
+                    local portalMap = child.Selection.Holder.Map
+                    if portaname and portaname.Text == selectedTier and portalMap and portalMap.Text == selectedMap then
+                        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SpawnPortal"):InvokeServer(child.Name)
+                        break  -- Sai do loop após abrir um portal
+                    end
+                end
+            end
+        end
+    end
+end
+
+local portaltier =game:GetService("ReplicatedStorage").Portals
+
+local children = portaltier:GetChildren()
+
+for i, child in ipairs(children) do
+    local blacklist = {
+        ["PackageLink"] = true,
+        ["Valentines Portal"] = true,
+    }
+    if not blacklist[child.Name] then
+            table.insert(ValuesportalTier ,child.Name)
+    end
+end
+
+-- Adiciona o dropdown 'Mapa'
+RightGroupBox:AddDropdown('Mapa', {
+    Values = ValueMapa, 
+    Default = "None", 
+    Multi = false,
+    Text = 'Select Map',
+    Tooltip = '',
+
+    Callback = function(value)
+        selectedMap = value  -- Atualiza o mapa selecionado
+    end
+})
+
+-- Adiciona o dropdown 'Tier'
+RightGroupBox:AddDropdown('Tier', {
+    Values = ValuesportalTier, 
+    Default = "None", 
+    Multi = false,
+    Text = 'Select Tier',
+    Tooltip = '',
+
+    Callback = function(value)
+        selectedTier = value  -- Atualiza o tier selecionado
+    end
+})
+
+
+-- Adiciona o toggle para ativar/desativar a abertura automática do portal
+RightGroupBox:AddToggle('Auto Open Portal', {
+    Text = 'Auto Open Portal',
+    Default = false,
+    Tooltip = '',
+    Callback = function(value)
+        getgenv().autoopenportal = value
+        if value then
+            openSelectedPortal()  -- Verifica se o portal deve ser aberto ao ativar o toggle
+        end
+    end
+})
 
 
 local FrameTimer = tick()
