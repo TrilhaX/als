@@ -1,3 +1,5 @@
+warn('[TEMPEST HUB] Loading Bypass')
+wait(1)
 warn('[TEMPEST HUB] Loading Ui')
 wait(1)
 local repo = 'https://raw.githubusercontent.com/TrapstarKSSKSKSKKS/LinoriaLib/main/'
@@ -5,6 +7,7 @@ local repo = 'https://raw.githubusercontent.com/TrapstarKSSKSKSKKS/LinoriaLib/ma
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+Library:Notify('Welcome to Tempest Hub', 5)
 
 local Window = Library:CreateWindow({
     Title = 'Tempest Hub | Anime Last Stand',
@@ -14,7 +17,14 @@ local Window = Library:CreateWindow({
     MenuFadeTime = 0.2
 })
 
-Library:Notify('Loading Anime Last Stand Script', 5)
+Library:Notify('Loading Dragon Soul Script', 5)
+warn('[TEMPEST HUB] Loading Function')
+wait(1)
+warn('[TEMPEST HUB] Loading Toggles')
+wait(1)
+warn('[TEMPEST HUB] Last Checking')
+wait(1)
+
 
 function autouseuniversalskill()
     while getgenv().autouseuniversalskill == true do
@@ -125,6 +135,25 @@ function autoupgrade()
         wait(waitTime) -- Você deve adicionar uma pausa para evitar sobrecarregar o servidor
     end
 end
+
+function returnEnemiesToWaypoint1()
+    while getgenv().returnenemietowaypoint1 == true do
+        local enemies = game.workspace.Enemies:GetChildren()
+        local waypoint1 = workspace.Map.Waypoints:FindFirstChild("1")
+        
+        if waypoint1 then
+            for i, enemy in ipairs(enemies) do
+                local humanoidRootPart = enemy:FindFirstChild("HumanoidRootPart")
+                if humanoidRootPart then
+                    local targetCFrame = GetCFrame(waypoint1)
+                    humanoidRootPart.CFrame = targetCFrame
+                end
+                wait()
+            end
+        end
+    end
+end
+
 
 local Tabs = {
     Main = Window:AddTab('Main'),
@@ -473,158 +502,91 @@ if portalid then
 end
 
 
-for i, child in ipairs(children) do
-    local blacklist = {
-        ["UIGridLayout"] = true,
-    }
-    if not blacklist[child.Name] then
-        local portalmap = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Items") and game:GetService("Players").LocalPlayer.PlayerGui.Items.BG.Portals[child.Name].Selection.Holder.Map
-    end
-end
-
-local maps = game:GetService("ReplicatedStorage").Gradients.Maps
-local ValueMapa = {}
-
-for _, child in ipairs(maps:GetChildren()) do
-    table.insert(ValueMapa, child.Name)
-end
-
--- Função para abrir um portal com o tier selecionado
-local selectedTier = "None"
-local selectedMap = "None"
-
--- Função para abrir o portal com o tier e mapa selecionados
-local function openSelectedPortal()
-    if selectedTier ~= "None" and selectedMap ~= "None" then
-        local portalid = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Items") and game:GetService("Players").LocalPlayer.PlayerGui.Items.BG.Portals
-        if portalid then
-            for _, child in ipairs(portalid:GetChildren()) do
-                if child.Name ~= "UIGridLayout" then
-                    local portaname = child.BG.Viewport.PortalName
-                    local portalMap = child.Selection.Holder.Map
-                    if portaname and portaname.Text == selectedTier and portalMap and portalMap.Text == selectedMap then
-                        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SpawnPortal"):InvokeServer(child.Name)
-                        break  -- Sai do loop após abrir um portal
-                    end
-                end
-            end
-        end
-    end
-end
-
-local portaltier =game:GetService("ReplicatedStorage").Portals
-
-local children = portaltier:GetChildren()
-
-for i, child in ipairs(children) do
-    local blacklist = {
-        ["PackageLink"] = true,
-        ["Valentines Portal"] = true,
-    }
-    if not blacklist[child.Name] then
-            table.insert(ValuesportalTier ,child.Name)
-    end
-end
-
--- Adiciona o dropdown 'Mapa'
-RightGroupBox:AddDropdown('Mapa', {
-    Values = ValueMapa, 
-    Default = "None", 
-    Multi = false,
-    Text = 'Select Map',
-    Tooltip = '',
-
-    Callback = function(value)
-        selectedMap = value  -- Atualiza o mapa selecionado
-    end
-})
-
--- Adiciona o dropdown 'Tier'
-RightGroupBox:AddDropdown('Tier', {
-    Values = ValuesportalTier, 
-    Default = "None", 
-    Multi = false,
-    Text = 'Select Tier',
-    Tooltip = '',
-
-    Callback = function(value)
-        selectedTier = value  -- Atualiza o tier selecionado
-    end
-})
-
-
--- Adiciona o toggle para ativar/desativar a abertura automática do portal
-RightGroupBox:AddToggle('Auto Open Portal', {
-    Text = 'Auto Open Portal',
+RightGroupBox:AddToggle('Return Enemy To Base', {
+    Text = 'Return Enemy To Base',
     Default = false,
-    Tooltip = '',
-    Callback = function(value)
-        getgenv().autoopenportal = value
-        if value then
-            openSelectedPortal()  -- Verifica se o portal deve ser aberto ao ativar o toggle
-        end
+    Callback = function(Value)
+        getgenv().returnenemietowaypoint1 = Value
+        returnenemietowaypoint1()
     end
 })
 
 
 local FrameTimer = tick()
-local FrameCounter = 0;
-local FPS = 60;
+local FrameCounter = 0
+local FPS = 60
 
-local WatermarkConnection = game:GetService('RunService').RenderStepped:Connect(function()
-    FrameCounter += 1;
+local WatermarkConnection
+
+-- Create a function to update FPS and ping information
+local function UpdateWatermark()
+    FrameCounter = FrameCounter + 1
 
     if (tick() - FrameTimer) >= 1 then
-        FPS = FrameCounter;
-        FrameTimer = tick();
-        FrameCounter = 0;
-    end;
+        FPS = FrameCounter
+        FrameTimer = tick()
+        FrameCounter = 0
+    end
 
     Library:SetWatermark(('Tempest Hub | %s fps | %s ms'):format(
         math.floor(FPS),
         math.floor(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue())
-    ));
-end);
+    ))
+end
 
+-- Connect the function to the RenderStepped event
+WatermarkConnection = game:GetService('RunService').RenderStepped:Connect(UpdateWatermark)
 
-local Tabs = {
-['UI Settings'] = Window:AddTab('UI Settings'),
+-- Create tabs for UI settings
+local TabsUI = {
+    ['UI Settings'] = Window:AddTab('UI Settings'),
 }
 
-Library:OnUnload(function()
+-- Unload function
+local function Unload()
     WatermarkConnection:Disconnect()
-
     print('Unloaded!')
     Library.Unloaded = true
-end)
+end
 
-local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
+-- UI Settings
+local MenuGroup = TabsUI['UI Settings']:AddLeftGroupbox('Menu')
 
-MenuGroup:AddButton('Unload', function() Library:Unload() end)
+-- Add an unload button
+MenuGroup:AddButton('Unload', Unload)
+
+-- Add a label and key picker for the menu keybind
 MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = true, Text = 'Menu keybind' })
 
-
+-- Define the ToggleKeybind variable
 Library.ToggleKeybind = Options.MenuKeybind
 
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 
 ThemeManager:SetFolder('Tempest Hub')
-SaveManager:SetFolder('Tempest Hub/Anime Adventures')
+SaveManager:SetFolder('Tempest Hub/_ALS')
 
-SaveManager:BuildConfigSection(Tabs['UI Settings'])
+SaveManager:BuildConfigSection(TabsUI['UI Settings'])
 
-ThemeManager:ApplyToTab(Tabs['UI Settings'])
+ThemeManager:ApplyToTab(TabsUI['UI Settings'])
 
 SaveManager:LoadAutoloadConfig()
 
-warn('[TEMPEST HUB] Loading UI Settings')
-wait(1)
+local GameConfigName = '_Anime_Last_Stand'
+local player = game.Players.LocalPlayer
+SaveManager:Load(player.Name .. GameConfigName)
+spawn(function()
+    while task.wait(1) do
+        if Library.Unloaded then
+            break
+        end
+        SaveManager:Save(player.Name .. GameConfigName)
+    end
+end)
 
-
+-- Disable player idling
 for i,v in pairs(getconnections(game.Players.LocalPlayer.Idled)) do
     v:Disable()
 end
-warn('[TEMPEST HUB] Loading Anti Afk')
-wait(1)
 warn('[TEMPEST HUB] Loaded')
